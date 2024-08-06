@@ -2,9 +2,9 @@ import RestaurantCards from "./RestaurantCards";
 import resList from "../utils/mockData";
 import { useEffect, useState } from "react";
 import Shimmer from "./Shimmer";
+import { Link } from "react-router-dom";
 
 
-// https://www.swiggy.com/dapi/menu/pl?page-type=REGULAR_MENU&complete-menu=true&lat=12.9352403&lng=77.624532&restaurantId=393840&catalog_qa=undefined&submitAction=ENTER
 
 const Body = () => {
 
@@ -33,14 +33,14 @@ const Body = () => {
         <div className="body">
 
             <div className="Filter">
-                <div className="search-
-                btn">
+                <div className="search-btn">
                     <input className="search-box" type="text" value={searchText} onChange={(e) => { setSearchText(e.target.value) }} />
                     <button onClick={() => {
                         const filteredList = restaurants.filter((res) => res.info.name.toLowerCase().includes(searchText.toLowerCase()))
                         setFilteredRestaurants(filteredList)
                     }} >Search</button>
                 </div>
+                
                 <button className="filter-btn" onClick={() => {
                     const filterdList = restaurants.filter((res) => res.info.avgRating > 4);
                     setRestaurants(filterdList)
@@ -53,7 +53,7 @@ const Body = () => {
 
             <div className="res-container">
                 {filteredRestaurants.map((restaurant) => (
-                    <RestaurantCards key={restaurant.info.id} resData={restaurant} />
+                   <Link key={restaurant.info.id}  to={"/Restaurant/"+restaurant.info.id}> <RestaurantCards resData={restaurant} /></Link>
                 ))}
 
             </div>
