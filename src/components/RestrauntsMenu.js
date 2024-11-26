@@ -1,24 +1,20 @@
-import { useEffect, useState } from "react";
 import Shimmer from "./Shimmer";
 import { useParams } from "react-router-dom";
+import useRestaurantMenu from "../utils/useRestaurantMenu";
+import RestaurantCatagory from "./RestaurantCatagory";
+import { useState } from "react";
 
 const RestrauntsMenu = () => {
-  const [resInfo, setResInfo] = useState(null);
+
+  const [showIndex, setShowIndex] = useState()
+ // console.log("ShowIndex", showIndex)
+  
   const {resId} = useParams()
 
-  console.log(resInfo);
 
-  useEffect(() => {
-    fetchMenu();
-  }, []);
+  const resInfo = useRestaurantMenu(resId);
 
-  const fetchMenu = async () => {
-    const data = await fetch(
-      "https://www.swiggy.com/dapi/menu/pl?page-type=REGULAR_MENU&complete-menu=true&lat=12.9352403&lng=77.624532&restaurantId="+resId+"&catalog_qa=undefined&submitAction=ENTER"
-    );
-    const json = await data.json();
-    setResInfo(json.data);
-  };
+
 
   if (resInfo === null) return <Shimmer />;
 
@@ -27,13 +23,42 @@ const RestrauntsMenu = () => {
   const { itemCards } =
     resInfo.cards[4].groupedCard.cardGroupMap.REGULAR.cards[2].card.card;
 
+ // console.log("ItemsCards", resInfo.cards[4].groupedCard.cardGroupMap.REGULAR.cards)
+
+    const catagories = resInfo.cards[4].groupedCard.cardGroupMap.REGULAR.cards.filter((c)=>
+      c.card?.["card"]?.["@type"] === "type.googleapis.com/swiggy.presentation.food.v2.ItemCategory"
+    );
+
+ //  console.log("Catagories",catagories)
+
   return (
-    <div>
-      <h1>{name}</h1>
-      <h3>{cuisines.join(", ")}</h3>
-      <h3>{costForTwoMessage}</h3>
-      <h3>{id}</h3>
-      <h3>
+    <div className="text-center">
+      <h1 className="font-bold text-2xl my-6">{name}</h1>
+      <p className="text-lg font-bold">{cuisines.join(", ")}- {costForTwoMessage}</p>
+
+      {catagories.map((catagory, index)=>
+        <RestaurantCatagory
+         key={catagory?.card?.card.title} 
+         data={catagory?.card?.card}
+         showItems={index=== showIndex ? true: false}
+         
+         setShowIndex={()=>setShowIndex(index)}    
+          />   
+         
+      )}
+
+           
+    </div>
+  );
+};
+
+export default RestrauntsMenu;
+
+
+
+
+  
+          {/* <h3>
         <ul>
           {itemCards.map((item) => (
             <li key={item.card.info.id}>
@@ -42,9 +67,4 @@ const RestrauntsMenu = () => {
             </li>
           ))}
         </ul>
-      </h3>
-    </div>
-  );
-};
-
-export default RestrauntsMenu;
+      </h3> */}
